@@ -1,10 +1,14 @@
-########################################################################################
+#############################################################################################
 ## A FREE AND OPEN-SOURCE FUTURE-PROOF PROTOCOL FOR EFFECTIVE UAV-BASED ARCHAEOLOGICAL SURVEY
 ## KELSEY M. REESE AND SEAN FIELD
 ## JOURNAL OF COMPUTER APPLICATIONS IN ARCHAEOLOGY
+## VOLUME(ISSUE): PG-PG
+#############################################################################################
 
-###########################################
+
+#############################################################################################
 # PRE-FIELD PROCESS
+#############################################################################################
 
 
 # Install Homebrew, Docker, OpenDroneMap, and dependencies
@@ -143,8 +147,9 @@ rgdal::writeOGR(polygon.coordinates,'./',layer='polygon_coordinates',driver='ESR
 # Specific instructions on how to use DroneDeploy and Frequently Asked Questions are available on the application's website (https://www.dronedeploy.com/).
 
 
-###########################################
+#############################################################################################
 # IN-FIELD PROCESS
+#############################################################################################
 
 
 # Arrive at the selected polygon in the field and move to the highest elevation in the polygon.
@@ -153,8 +158,9 @@ rgdal::writeOGR(polygon.coordinates,'./',layer='polygon_coordinates',driver='ESR
 # Wait for each image collection process to finish. The UAV will automatically return to its launch position when it is either getting too low on battery or when it is done collecting all images in the flight plan.
 
 
-###########################################
+#############################################################################################
 # POST-FIELD PROCESS
+#############################################################################################
 
 
 # Open Terminal, create directory for collected images in your project folder, move images into that folder, open and run OpenDroneMap.
@@ -184,4 +190,4 @@ docker run -ti --rm -v /Users/USERNAME/Documents/PATH/TO/PROJECT:/datasets/code 
 # The DTM can then be opened in you GIS of choice (R, QGIS, etc.) and used for terrain analyses
 
 
-
+#############################################################################################
