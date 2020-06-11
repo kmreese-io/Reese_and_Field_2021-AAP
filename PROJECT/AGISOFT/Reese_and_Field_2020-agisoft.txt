@@ -1,0 +1,100 @@
+###############################################################################################
+## A FREE AND OPEN-SOURCE FUTURE-PROOF PROTOCOL FOR EFFECTIVE UAV-BASED ARCHAEOLOGICAL RESEARCH
+## KELSEY M. REESE AND SEAN FIELD
+## PLOS ONE
+## YEAR VOL(NUM): PGS-PGS
+###############################################################################################
+## AUTHOR: SEAN FIELD
+###############################################################################################
+
+
+###############################################################################################
+## PYTHON SCRIPT FOR AGISOFT PHOTOSCAN/METASHAPE
+###############################################################################################
+
+
+## INSTRUCTIONS FOR INSTALLATION AND PROCESSING ENVIRONMENT
+###############################################################################################
+
+# To run a full project in Agisoft/Metashape you will need the Pro version which upon purchase will give you activation key
+
+# Once getting key, open Agisoft/Metashape App, and activate
+# Then import photos through Workflow -> Add Photos and select all photographs that were acquired for a single project/model
+# Geotagged photographs (meaning most taken by drone and guaranteed if using DJI/DroneDeploy) will automatically import in workspace viewer in 3D space, meaning you will be able to see points where each individual photograph was taken and see their relationship to each other
+# This will allow you to observe whether all photographs from flight paths have been imported 
+# Save document as ProjectEXAMPLE.psx
+
+# Open preferred text editor
+# Copy following script and save as ProjectEXAMPLE.py
+# A full list of parameters for Agisoft Photoscan/Metashape are available her: https://www.agisoft.com/pdf/metashape_python_api_1_5_0.pdf
+
+
+###############################################################################################
+## ProjectEXAMPLE.py
+###############################################################################################
+
+import PhotoScan
+# GRAB PSX FILE
+doc = PhotoScan.Document()
+doc.open("../Project/ProjectEXAMPLE.psx")
+doc.read_only=False
+
+chunk=doc.chunk
+
+# ALIGN PHOTOS
+chunk.matchPhotos(accuracy=PhotoScan.HighAccuracy, generic_preselection=True, reference_preselection=False)
+chunk.alignCameras()
+doc.save()
+
+# accuracy=PhotoScan.HighAccuracy allows software to work with photographs in their original size
+# generic_preselection=TRUE allows software to match photos by detecting features that exist in more than one photograph via a lower accuracy setting first – this increases efficiency with minimal consequences on the resolution outcomes of the model
+# reference_preselection=False disallows the software to pair photos based on the measured camera location 
+# you can also include key point or tie point limits, I would not recommend stipulating these values unless you have to
+
+# BUILD DENSE CLOUD
+chunk.buildDepthMaps(quality=PhotoScan.Quality.HighQuality, filter=PhotoScan.FilterMode.ModerateFiltering)
+chunk.buildDenseCloud()
+
+# quality=PhotoScan.Quality.HighQuality allows software to preliminarily downscale all imaged by a factor of 4
+# filter=Photoscan.FilterMode.Moderate allows software to produce moderate depth maps, which balances the need to reconstruct small details that are spatially distinguished (best accomplished when using Photoscan.FilterMode.Mild) and the need to ignore small details that are spatially distinguished (best accomplished when using Photoscan.FilterMode.Aggressive)
+
+# BUILD DIGITAL ELEVATION MODEL
+chunk.buildDem(source=PhotoScan.DenseCloudData, interpolation=PhotoScan.EnabledInterpolation)
+
+# interpolation=Photoscan.EnabledInterpolation allows Agisoft to use an inverse distance weighting Interpolation algorithm that allows software to calculate elevation for all areas of a scene that are visible on at least one image
+
+# SAVE PROJECT 
+doc.save(path="../Project/ProjectEXAMPLE.psx", chunks =[doc.chunk])
+
+
+## INSTRUCTIONS FOR RUNNING ON A BATCH PROCESS ON A REMOTE COMPUTER
+###############################################################################################
+
+# You can run ProjectEXAMPLE.py in Photoscan/Metashape interface by opening the App and go to Tools -> Run Script (or pressing Ctrl + R) and selecting ProjectEXAMPLE.py from appropriate directory
+
+# You can also run through a terminal
+# This is optimal if you are running projects with >500 images, want high resolution and have remote access to a super-computer or a node that has larger RAM
+# There will be many ways to do this although one of the most common requires a separate job script for submitting to an external node
+# To do this create an additional Python Script and save as ProjectEXAMPLEsubmittonode.py 
+
+
+###############################################################################################
+## ProjectEXAMPLEsubmittonode.py
+###############################################################################################
+
+# Open Terminal
+cd ~/photoscan-pro
+
+# ensure photoscan is deactivated
+./photoscan.sh --deactivate
+
+# activate photoscan/metashape-pro with twenty-five digit Agisoft/Metashape-Pro Code
+./photoscan.sh --activate (00000-00000-00000-00000-00000)
+
+#run the processing script (output.txt optional)
+./photoscan.sh -r ~/ProjectEXAMPLE.py  -platform offscreen > ~/output.txt
+
+#deactivate photoscan after processing is complete
+./photoscan.sh --deactivate
+cd -
+
