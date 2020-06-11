@@ -1,0 +1,158 @@
+########################################################################################################
+## A THEORETICAL AND METHODOLOGICAL FRAMEWORK FOR FREE AND OPEN-SOURCE UAV-BASED ARCHAEOLOGICAL RESEARCH
+## KELSEY M. REESE AND SEAN FIELD
+## PLOS ONE
+## YEAR VOL(NUM): PGS-PGS
+########################################################################################################
+## AUTHOR: KELSEY M. REESE
+########################################################################################################
+
+
+########################################################################################################
+## PRE-FIELD PROCESS: INSTALLING SOFTWARE AND DEFINING AN AREA OF INTEREST ##
+########################################################################################################
+
+
+## INSTALLATION
+########################################################################################################
+
+# Each line presented below is a separate line of code that should be run individually in Terminal. Wait for each process to complete before starting the next.
+# Do not enter or try to run lines starting with '#'
+
+# Open the Terminal application on your MacOS device (Applications > Utilities > Terminal)
+
+# Install Homebrew (for more information: https://www.brew.sh) by entering the following line in Terminal and pressing 'Return.' Follow all prompts to enter your password.
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# Install Docker and then Docker Machine
+brew cask install docker
+brew install docker-machine
+
+# Install Git, Python, and GDAL
+brew install git
+brew install python
+brew install gdal
+
+# Install OpenDroneMap (although this tool is free and open-source, please consider contributing to the creators if you can! https://www.opendronemap.org)
+git clone https://github.com/OpenDroneMap/OpenDroneMap.git
+
+# Install R
+brew install r
+
+# Open R and define package repository
+R
+repository  <-  getOption('repos')
+repository['CRAN']  <-  'http://cran.us.r-project.org'
+options(repos = repository)
+
+# Install, and subsequently call, all required packages for the project
+install.packages(c('sp','rgdal','raster','rgeos'))
+library('sp');library('rgdal');library('raster');library('rgeos')
+
+
+## DEFINING AREA OF INTEREST
+########################################################################################################
+
+# Create and set a working directory for your project. The file path in this step will be unique to your computer - please change the file path as necessary
+dir.create('Users/USERNAME/Documents/PATH/TO/PROJECT/',recursive=T,showWarnings=F)
+set.wd('Users/USERNAME/Documents/PATH/TO/PROJECT/')
+
+# The 'master.projection' will be unique to your project - please fill in the correct projection system. The 'longlat.projection' should be kept as is
+master.projection <- sp::CRS('+proj=YOUR +datum=PROJ4 +zone=HERE')
+
+# Place a shapefile of your study area into the working directory for your project
+
+# Load the shapefile of your study area
+study.area <- rgdal::readOGR('./',layer='study_area_shapefile')
+raster::projection(study.area) <- master.projection
+
+
+## DEFINING FLIGHT PARAMETERS AND POLYGONS
+########################################################################################################
+
+# Define a conservative estimate of the UAV battery life you have available to you
+# If you are using DroneDeploy in the field, the UAV will automatically return to its launch location when the battery is running low, so this number can be flexible
+flight.time.minutes <- 15
+
+# Calculate the grid of imagery collection tiles
+hectares.per.battery <- flight.time.minutes / 2.25
+flight.area <- c(sqrt(hectares.per.battery*10000),sqrt(hectares.per.battery*10000))
+
+# Define UAV flight polygons to use in DroneDeploy
+grid.points <- makegrid(study.area,cellsize=flight.area)
+spatial.grid <- SpatialPoints(grid.points,proj4string=master.projection)
+spatial.grid.survey <- SpatialPixels(spatial.grid[study.area,])
+survey.polygons <- as(spatial.grid.survey,'SpatialPolygons')
+IDs <- sapply(slot(survey.polygons,'polygons'), function(x) slot(x,'ID'))
+df <- data.frame(rep(0,length(IDs)),row.names=IDs)
+UAV.polygons <- SpatialPolygonsDataFrame(survey.polygons,df)
+
+
+## CREATING FLIGHT POLYGONS
+########################################################################################################
+
+rgdal::writeOGR(UAV.polygons,'./',layer='UAV_survey_polygons',driver='ESRI Shapefile')
+
+
+## EXAMPLE: EXPORTING A SPECIFIC POLYGON
+########################################################################################################
+
+# Define the index of the specific polygon you would like to export, and export that one polygon. The code below is using the example of '225', but that number should be replaced
+index <- 225
+rgdal::writeOGR(UAV.polygons[index,],'./',layer='UAV_survey_polygons',driver='ESRI Shapefile')
+
+
+## EXAMPLE: EXPORTING POLYGONS BY SITE COORDINATES
+########################################################################################################
+
+# Change the 'filename' and the 'Easting' and 'Northing' column names to match those representing coordinates in your *.csv file
+example.coordinates <- utils::read.csv('./filename.csv')
+datums <- sp::SpatialPointsDataFrame(coords=as.matrix(base::cbind(example.coordinates$Easting,example.coordinates$Northing)),example.coordinates,proj4string=master.projection)
+projection(UAV.survey.polygons) <- master.projection
+polygon.coordinates <- UAV.survey.polygons[datums,]
+rgdal::writeOGR(polygon.coordinates,'./',layer='polygon_coordinates',driver='ESRI Shapefile')
+
+
+## BEFORE GOING INTO THE FIELD
+########################################################################################################
+
+# Download the DroneDeploy application to your UAV remote
+# Import each flight polygon to the remote - check specific instructions for your device to complete this step
+# Import each polygon to the DroneDeploy application and set up desired flight parameters
+# Specific instructions on how to use DroneDeploy and Frequently Asked Questions are available on the application's website (https://www.dronedeploy.com/)
+
+
+########################################################################################################
+## IN-FIELD PROCESS: COLLECTING IMAGES ##
+########################################################################################################
+
+# Arrive at the selected polygon in the field and move to the highest elevation within the polygon
+# Set up the UAV for flight, start DroneDeploy, and launch the UAV via the desired DroneDeploy flight plan
+
+# PRO TIP: at the beginning of each flight DroneDeploy will take one image, facing forward, before leaving the ground. To make it easier to identify which images belong to which flight, especially when making multiple flights per day, it is handy to have a small dry-erase board on-hand to write identifying information about the flight, which can be easily recognized later to make sure all images for a collection area are later used in the terrain model
+# Wait for each image collection process to finish. The UAV will automatically return to its launch position when it is either getting too low on battery or when it is done collecting all images in the flight plan
+
+
+########################################################################################################
+## POST-FIELD PROCESS: PRODUCING A DIGITAL TERRAIN MODEL ##
+########################################################################################################
+
+# Open Terminal and create a folder within your project directory called 'images'
+cd ~/Documents/PATH/TO/PROJECT/
+mkdir images
+
+# Place orthophoto images of one flight into the 'images' folder within project path
+
+# Start Docker
+open -a docker
+
+# Once Docker is running, go to Preferences > Advanced and increase the CPUs, Memory, and Swap
+
+# Run OpenDroneMap to produce the highest-resolution terrain model possible based on the input images
+# A full list of parameters for OpenDroneMap are available here: https://github.com/OpenDroneMap/ODM/wiki/Run-Time-Parameters
+# Change the path to your project directory, OpenDroneMap will automatically look for a file named 'images within the project folder
+
+docker run -ti --rm -v /Users/USERNAME/Documents/PATH/TO/PROJECT:/datasets/code opendronemap/odm --project-path /datasets --dtm --dem-resolution 0.0001 --time --skip-3dmodel
+
+# The final Digital Terrain Model (DTM) will be available in /Users/USERNAME/Documents/PATH/TO/PROJECT/odm_dem/dtm.tif
+
