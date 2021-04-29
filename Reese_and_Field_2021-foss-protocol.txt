@@ -193,7 +193,7 @@ rgdal::writeOGR(polygon.coordinates,'./',layer='polygon_coordinates',driver='ESR
 ########################################################################################################
 
 # Download a photo collection application to your UAV remote that is compatible with the available UAV
-# Potential applications: DroneDeploy (https://support.dronedeploy.com/docs/recommended-and-supported-drones); Pix4D (https://support.pix4d.com/hc/en-us/articles/203991609-Supported-drones-cameras-and-controllers)
+# Potential applications: DroneDeploy (https://support.dronedeploy.com/docs/recommended-and-supported-drones); Pix4D (https://support.pix4d.com/hc/en-us/articles/203991609-Supported-drones-cameras-and-controllers); Copterus (https://www.copterus.app); Maven (https://www.mavenpilot.com)
 # NOTE: Pix4D does not provide equal support for iOS and Android devices on all of their compatible UAVs, nor is flight-planning supported on iOS devices
 # Ensure the photo collection application is compatible with the UAV and iOS or Android remote and allows for pre-flight planning by importing a polygon of the flight area
 # Ensure the application allows for the image files to be downloaded to your computer after data collection is completed in the field
