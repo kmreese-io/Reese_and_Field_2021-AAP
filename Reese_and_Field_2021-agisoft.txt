@@ -1,7 +1,7 @@
 ########################################################################################################
 ## A METHODOLOGICAL FRAMEWORK FOR FREE AND OPEN-SOURCE UAV-BASED ARCHAEOLOGICAL RESEARCH
 ## KELSEY M. REESE AND SEAN FIELD
-## PLOS ONE
+## ADVANCES IN ARCHAEOLOGICAL PRACTICE
 ## YEAR VOL(NUM): PGS-PGS
 ########################################################################################################
 ## AUTHOR: SEAN FIELD
@@ -47,7 +47,7 @@ chunk.alignCameras()
 doc.save()
 
 # accuracy=PhotoScan.HighAccuracy allows software to work with photographs in their original size
-# generic_preselection=TRUE allows software to match photos by detecting features that exist in more than one photograph via a lower accuracy setting first – this increases efficiency with minimal consequences on the resolution outcomes of the model
+# generic_preselection=TRUE allows software to match photos by detecting features that exist in more than one photograph via a lower accuracy setting first â€“ this increases efficiency with minimal consequences on the resolution outcomes of the model
 # reference_preselection=False disallows the software to pair photos based on the measured camera location 
 # you can also include key point or tie point limits, I would not recommend stipulating these values unless you have to
 
