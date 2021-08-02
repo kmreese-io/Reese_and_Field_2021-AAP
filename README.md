@@ -10,7 +10,7 @@ Each line presented below is a separate line of code that should be run individu
 
 Please note that the entirety of the following code is intended to run within Terminal. Both bash and R commands can be run from the Terminal command line and the process is shown assuming you are using only one interface. Using other user interfaces such as R Studio is certainly reasonable, but that process is not explicitly described here.
 
-[To follow along with the examples below, please download the 'example-data' folder within the Github repository.](https://github.com/kmreese-io/Reese_and_Field_2021-AAP)
+[To follow along with the examples below, please download the 'example-data' folder within the Github repository.](https://github.com/kmreese-io/Reese_and_Field_2021-AAP/tree/master/example-data)
 
 The following installation and analysis was tested on a clean installation of MacOS Big Sur 11.5.1 on August 1, 2021.
 
@@ -182,7 +182,6 @@ limiting.landcover[limiting.landcover == 52] <- 3
 limiting.landcover[limiting.landcover == 71] <- 2
 limiting.landcover[limiting.landcover == 81] <- 1
 limiting.landcover[limiting.landcover > 4] <- 0
-
 ```
 
 Calculate greatest landcover values per ```UAV.polygons```.
