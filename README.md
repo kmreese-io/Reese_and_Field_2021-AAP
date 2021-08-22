@@ -1,4 +1,4 @@
-# The FOSS Protocol
+# The FOSS UAV Protocol
 A companion document for **A Methodological Framework for Free and Open-source UAV-based Archaeological Research** published in *Advances in Archaeological Practice* and written by [Kelsey M. Reese and Sean Field (2021)](https://www.cambridge.org/core/journals/advances-in-archaeological-practice/latest-issue).
 
 *************************************************************
