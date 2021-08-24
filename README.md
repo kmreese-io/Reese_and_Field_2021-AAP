@@ -34,7 +34,7 @@ To install Homebrew, enter the following line in Terminal and press 'Return.' Fo
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Install Docker and then Docker Machine.
+Install Docker and then Docker Machine (required for OpenDroneMap).
 ```{r, engine = 'bash', eval = FALSE}
 brew install docker docker-machine
 ```
