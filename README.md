@@ -301,7 +301,7 @@ At the beginning of each flight DroneDeploy will take one image, facing forward,
 
 Open Terminal and create a folder within your project directory called 'images'.
 ```{r, engine = 'bash', eval = FALSE}
-cd ~/Documents/FOSS-UAV-Protocol
+cd ~/Documents/FOSS-UAV-Protocol/Reese_and_Field_2021-AAP/example-data
 mkdir images
 ```
 
