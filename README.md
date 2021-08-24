@@ -10,7 +10,7 @@ Each line presented below is a separate line of code that should be run individu
 
 Please note that the entirety of the following code is intended to run within Terminal. Both bash and R commands can be run from the Terminal command line and the process is shown assuming you are using only one interface. Using other user interfaces such as R Studio is certainly reasonable, but that process is not explicitly described here.
 
-[To follow along with the examples below, please download the 'example-data' folder within the Github repository. The download is approximately 850 mb, so it may take a few minutes depending on your connection speeds.](https://github.com/kmreese-io/Reese_and_Field_2021-AAP/tree/master/example-data)
+An example dataset is provided, below, to follow along with the provided example code. Please note that the download is approximately 850 mb, so it may take a few minutes depending on your download speeds.
 
 The following installation and analysis was tested on a clean installation of MacOS Big Sur 11.5.1 on August 1, 2021 using the following versions:  
 * Docker 20.10.7
@@ -115,10 +115,11 @@ base::quit()
 ```
 
 ## Defining an Area of Interest
-Create a working directory for the project and move the downloaded example-data into the working directory.
+Create a working directory for the project, navigate to that directory, and download example-data for the project. Please not that the download is approximately 850 mb and may take several minutes depending on your download speeds.
 ```{r, engine = 'bash', eval = FALSE}
 mkdir -p Documents/FOSS-UAV-Protocol
-mv ~/Downloads/example-data ~/Documents/FOSS-UAV-Protocol/example-data
+cd ~/Documents/FOSS-UAV-Protocol/
+git clone https://github.com/kmreese-io/Reese_and_Field_2021-AAP
 ```
 
 Open R within Terminal.
@@ -133,7 +134,7 @@ library('sp');library('rgdal');library('raster');library('rgeos');library('FedDa
 
 Set the working directory for your project.
 ```{r, eval = FALSE}
-base::setwd('./Documents/FOSS-UAV-Protocol/example-data/')
+base::setwd('./Documents/FOSS-UAV-Protocol/Reese_and_Field_2021-AAP/example-data/')
 ```
 
 Define the ```master.projection```. The ```master.projection``` will be unique to your project, so please fill in the correct projection system, if necessary.
