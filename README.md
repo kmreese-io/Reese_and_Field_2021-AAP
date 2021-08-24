@@ -10,9 +10,18 @@ Each line presented below is a separate line of code that should be run individu
 
 Please note that the entirety of the following code is intended to run within Terminal. Both bash and R commands can be run from the Terminal command line and the process is shown assuming you are using only one interface. Using other user interfaces such as R Studio is certainly reasonable, but that process is not explicitly described here.
 
-[To follow along with the examples below, please download the 'example-data' folder within the Github repository.](https://github.com/kmreese-io/Reese_and_Field_2021-AAP/tree/master/example-data)
+[To follow along with the examples below, please download the 'example-data' folder within the Github repository. The download is approximately 850 mb, so it may take a few minutes depending on your connection speeds.](https://github.com/kmreese-io/Reese_and_Field_2021-AAP/tree/master/example-data)
 
-The following installation and analysis was tested on a clean installation of MacOS Big Sur 11.5.1 on August 1, 2021.
+The following installation and analysis was tested on a clean installation of MacOS Big Sur 11.5.1 on August 1, 2021 using the following versions:  
+* Docker 20.10.7
+* Docker Machine 0.16.2
+* Git 2.32.0_1
+* Python 3.9.6
+* gdal 3.3.1_2
+* proj 8.1.0
+* libgit2 1.1.1
+* udunits 2.2.27.6_1
+* R 4.1.0
 
 ### Installation
 
@@ -67,11 +76,11 @@ Leave the R environment within Terminal.
 base::quit()
 ```
 
-The software required to run the FOSS Protocol is now installed. If you wish to update any of these installations in the future, please refer to the following section. Otherwise, move to 'Defining an Area of Interest.'
+The software required to run the FOSS UAV Protocol is now installed. If you wish to update any of these installations in the future, please refer to the following section. Otherwise, move to 'Defining an Area of Interest.'
 
 ### Updating
 
-The most up-to-date versions of each software package can be installed (if available) each time the FOSS protocol is run to ensure compatibility with the newest technology and access to the most advanced features.
+The most up-to-date versions of each software package can be installed (if available) each time the FOSS UAV Protocol is run to ensure compatibility with the newest technology and access to the most advanced features.
 
 Update each software and framework with Homebrew.
 ```{r, engine = 'bash', eval = FALSE}
@@ -108,8 +117,8 @@ base::quit()
 ## Defining an Area of Interest
 Create a working directory for the project and move the downloaded example-data into the working directory.
 ```{r, engine = 'bash', eval = FALSE}
-mkdir Documents/FOSS-Protocol
-mv ~/Downloads/example-data ~/Documents/FOSS-Protocol/example-data
+mkdir -p Documents/FOSS-UAV-Protocol
+mv ~/Downloads/example-data ~/Documents/FOSS-UAV-Protocol/example-data
 ```
 
 Open R within Terminal.
@@ -124,7 +133,7 @@ library('sp');library('rgdal');library('raster');library('rgeos');library('FedDa
 
 Set the working directory for your project.
 ```{r, eval = FALSE}
-base::setwd('./Documents/FOSS-Protocol/example-data/')
+base::setwd('./Documents/FOSS-UAV-Protocol/example-data/')
 ```
 
 Define the ```master.projection```. The ```master.projection``` will be unique to your project, so please fill in the correct projection system, if necessary.
@@ -167,7 +176,7 @@ UAV.polygons <- sp::SpatialPolygonsDataFrame(survey.polygons,df)
 Import National Land Cover Database (provided in the example-data, otherwise please refer to https://www.mrlc.gov/viewer/ for data downloads), crop by extent of the study area and transform to ```master.projection```.
 ```{r, eval = FALSE}
 nlcd.2019 <- raster::raster('./landcover/NLCD_gAI1d9GkPzPC2lNKnF2o/NLCD_2019_Land_Cover_L48_20210604_gAI1d9GkPzPC2lNKnF2o.tiff')
-study.area.reprojected <- sp::spTransform(study.area,test@crs)
+study.area.reprojected <- sp::spTransform(study.area,nlcd.2019@crs)
 landcover <- raster::crop(nlcd.2019,polygon_from_extent(study.area.reprojected))
 landcover <- raster::projectRaster(landcover,crs=master.projection,method='ngb')
 ```
@@ -203,7 +212,7 @@ quartiles <- seq(min(UAV.polygons$landcover.value),max(UAV.polygons$landcover.va
 
 ## Creating Flight Polygons
 
-Write all polygons with assigned landcover values to a shapefile to help plan what are likely to be the most productive flights. Opening this layer in QGIS, for example, and changing the colorscale of each polygon by value is a great way to quickly assess how effective the FOSS Protocol may be in a particular area.
+Write all polygons with assigned landcover values to a shapefile to help plan what are likely to be the most productive flights. Opening this layer in QGIS, for example, and changing the colorscale of each polygon by value is a great way to quickly assess how effective the FOSS UAV Protocol may be in a particular area.
 ```{r, eval = FALSE}
 rgdal::writeOGR(UAV.polygons,'./',layer='UAV_survey_polygons',driver='ESRI Shapefile')
 ```
@@ -266,7 +275,7 @@ Other applications are available, but please check:
 
 Import each flight polygon to the remote - check specific instructions for your device to complete this step.
 
-Import each polygon to the application and set up desired flight parameters. The example shown for the FOSS Protocol uses default flight settings in the DroneDeploy application.
+Import each polygon to the application and set up desired flight parameters. The example shown for the FOSS UAV Protocol uses default flight settings in the DroneDeploy application.
 
 Please refer to the application's website for specific instructions for its use in the field.
 
@@ -291,7 +300,7 @@ At the beginning of each flight DroneDeploy will take one image, facing forward,
 
 Open Terminal and create a folder within your project directory called 'images'.
 ```{r, engine = 'bash', eval = FALSE}
-cd ~/Documents/FOSS-Protocol
+cd ~/Documents/FOSS-UAV-Protocol
 mkdir images
 ```
 
@@ -306,11 +315,11 @@ Once Docker is running, go to Preferences > Advanced and increase the CPUs, Memo
 
 Run OpenDroneMap to produce the highest-resolution terrain model possible based on the input images.
 ```{r, engine = 'bash', eval = FALSE}
-docker run -ti --rm -v ~/Documents/FOSS-Protocol:/datasets/code opendronemap/odm --project-path /datasets --dtm --dem-resolution 0.0001 --time --skip-3dmodel
+docker run -ti --rm -v ~/Documents/FOSS-UAV-Protocol:/datasets/code opendronemap/odm --project-path /datasets --dtm --dem-resolution 0.0001 --time --skip-3dmodel
 ```
 
 ### Results
-The final Digital Terrain Model (DTM) will be available in '~/Documents/FOSS-Protocol/odm_dem/dtm.tif'
+The final Digital Terrain Model (DTM) will be available in '~/Documents/FOSS-UAV-Protocol/odm_dem/dtm.tif'
 
 Please note that the code provided uses mostly default parameters, but OpenDroneMap offers a multitude of runtime options: https://github.com/OpenDroneMap/ODM/wiki/Run-Time-Parameters
 
